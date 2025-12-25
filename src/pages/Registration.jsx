@@ -1,18 +1,11 @@
-// import React, { use } from 'react';
-// import { Link } from 'react-router';
-// import { AuthContext } from '../provider/AuthProvider';
-
-// const Registration = () => {
-//     const { createUser } = use(AuthContext)
-
 import { useContext } from 'react';
 import { Link } from 'react-router';
 import { AuthContext } from '../provider/AuthProvider';
 
 const Registration = () => {
     const auth = useContext(AuthContext);
+    const { createUser, setUser } = auth || {};
 
-    const { createUser } = auth || {};
 
     const handleRegister = (e) => {
         e.preventDefault();
@@ -26,12 +19,13 @@ const Registration = () => {
         createUser(email, password)
             .then(result => {
                 const user = result.user;
-                console.log(user)
+                // console.log(user)
+                setUser(user)
             })
             .catch((error) => {
-                // const errorCode = error.code;
-                const errorMessage = error.message;
-                alert(errorMessage)
+                const errorCode = error.code;
+                // const errorMessage = error.message;
+                alert(errorCode,)
             });
     }
     return (
@@ -95,3 +89,16 @@ const Registration = () => {
 };
 
 export default Registration;
+
+
+
+
+
+
+
+// import React, { use } from 'react';
+// import { Link } from 'react-router';
+// import { AuthContext } from '../provider/AuthProvider';
+
+// const Registration = () => {
+//     const { createUser } = use(AuthContext)
