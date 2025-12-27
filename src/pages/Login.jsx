@@ -1,12 +1,15 @@
-import React, { use } from 'react';
-import { Link } from 'react-router';
+import React, { use, useState } from 'react';
+import { Link, useLocation, useNavigate } from 'react-router';
 import { AuthContext } from '../provider/AuthProvider';
 
 const Login = () => {
+    const [error, setError] = useState('')
     const { signIn } = use(AuthContext)
-
     // const auth = useContext(AuthContext);
     // const { signIn } = auth || {};
+
+    const location = useLocation();
+    const navigate = useNavigate();
 
     const handleLogin = (e) => {
         e.preventDefault()
@@ -14,14 +17,16 @@ const Login = () => {
         const email = form.email.value;
         const pass = form.pass.value;
         // console.log({ email, pass })
-
         signIn(email, pass)
-            .then((result) => {
-                const user = result.user;
-                console.log(user)
+            .then(() => {
+                // const user = result.user;
+                // console.log(user)
+                navigate(`${location.state? location.state : '/'}`)
             })
             .catch((error) => {
-                alert(error.code)
+                // alert(error.code)
+                setError(error.code)
+                // console.log(error)
             })
     }
     return (
@@ -32,14 +37,17 @@ const Login = () => {
                     <fieldset className="fieldset">
                         {/* email */}
                         <label className="label">Email</label>
-                        <input name='email' type="email" className="input" placeholder="Email" />
+                        <input name='email' type="email" className="input" placeholder="Email" required/>
 
                         {/* password */}
                         <label className="label">Password</label>
-                        <input name='pass' type="password" className="input" placeholder="Password" />
+                        <input name='pass' type="password" className="input" placeholder="Password" required/>
                         <div><a className="link link-hover">Forgot password?</a></div>
 
                         <button type='submit' className="btn btn-neutral mt-4">Login</button>
+                        {
+                            error? <p className='text-red-500'>{error}</p>: ''
+                        }
                         <p className='font-semibold text-center mt-5'>Don't have an account?{'  '}
                             <Link className='text-secondary' to={'/auth/register'}>Registration</Link>
                         </p>

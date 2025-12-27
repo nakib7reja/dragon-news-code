@@ -1,26 +1,41 @@
-import { useContext } from 'react';
-import { Link } from 'react-router';
+import { useContext, useState } from 'react';
+import { Link, useNavigate } from 'react-router';
 import { AuthContext } from '../provider/AuthProvider';
 
 const Registration = () => {
     const auth = useContext(AuthContext);
-    const { createUser, setUser } = auth || {};
+    const { createUser, setUser, updateUser } = auth || {};
+    const [nameError, setNameError] = useState('')
 
+    const navigate = useNavigate();
 
     const handleRegister = (e) => {
         e.preventDefault();
         const form = e.target;
         const name = form.name.value;
+        if (name.length < 5) {
+            setNameError('name must be more then 5 character')
+            // return
+        }
         const photo = form.photo.value;
         const email = form.email.value;
         const password = form.pass.value;
-        console.log({ name, photo, email, password })
+        // console.log({ name, photo, email, password })
 
         createUser(email, password)
             .then(result => {
                 const user = result.user;
                 // console.log(user)
-                setUser(user)
+                updateUser({ displayName: name, photoURL: photo })
+                    .then(() => {
+                        setUser({ ...user, displayName: name, photoURL: photo })
+                        navigate('/')
+                    })
+                    .catch(() => {
+                        // console.log(error)
+                        setUser(user)
+                    });
+
             })
             .catch((error) => {
                 const errorCode = error.code;
@@ -44,6 +59,9 @@ const Registration = () => {
                             placeholder="Name"
                             required
                         />
+                        {
+                            nameError ? <p className='text-red-500'>{nameError}</p> : ''
+                        }
 
                         {/* Photo Url */}
                         <label className="label">Photo URL</label>

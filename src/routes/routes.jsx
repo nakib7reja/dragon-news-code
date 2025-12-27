@@ -6,6 +6,8 @@ import Login from "../pages/Login";
 import Registration from "../pages/Registration";
 import AuthLayout from "../layouts/AuthLayout";
 import NewsDetails from "../pages/NewsDetails";
+import PrivateRoute from "../provider/PrivateRoute";
+import Loading from "../pages/Loading";
 
 const router = createBrowserRouter([
     {
@@ -19,7 +21,15 @@ const router = createBrowserRouter([
             {
                 path: '/category/:id',
                 element: <CategoryNews></CategoryNews>,
-                loader: () => fetch('/news.json')
+                loader: async ({ params }) => {
+                    const res = await fetch("/news.json"); // শুরুতে '/' দিতে ভুলবেন না
+                    if (!res.ok) {
+                        throw new Response("Not Found", { status: 404 });
+                    }
+                    const data = await res.json();
+                    return data;
+                },
+                hydrateFallbackElement: <Loading></Loading>
             }
         ]
     },
@@ -39,8 +49,20 @@ const router = createBrowserRouter([
     },
     {
         path: '/news-details/:id',
-        element: <NewsDetails></NewsDetails>,
-        loader: () => fetch('/news.json')
+        element: (
+            <PrivateRoute>
+                <NewsDetails></NewsDetails>
+            </PrivateRoute>
+        ),
+        loader: async ({ params }) => {
+            const res = await fetch("/news.json"); // শুরুতে '/' দিতে ভুলবেন না
+            if (!res.ok) {
+                throw new Response("Not Found", { status: 404 });
+            }
+            const data = await res.json();
+            return data;
+        },
+        hydrateFallbackElement: <Loading></Loading>
     },
     {
         path: '/*',
